@@ -32,7 +32,7 @@ impl Board {
         //     brd[x][brd_size.1 - 3] = Some(Checker::new(Order::BLACK));
         // }
 
-        brd[2][2] = Some(Checker::new(Order::WHITE));
+        brd[6][6] = Some(Checker::new(Order::WHITE));
         brd[3][3] = Some(Checker::new(Order::BLACK));
         brd[3][5] = Some(Checker::new(Order::BLACK));
         brd[3][7] = Some(Checker::new(Order::BLACK));
@@ -71,32 +71,34 @@ impl Board {
         let ways_top = [(-1, 1), (1, 1)];
         let ways_down = [(-1, -1), (1, -1)];
 
+        let pos = (pos.0 as i32, pos.1 as i32);
+
         if is_king {
-            let maxx = std::cmp::max(self.board.len() as u32, self.board[0].len() as u32);
+            let maxx = std::cmp::max(self.board.len() as i32, self.board[0].len() as i32);
             for xy in 1..maxx {
                 if self.is_pos_empty((pos.0 + xy, pos.1 + xy)) {
-                    steps.insert((pos.0 + xy, pos.1 + xy));
+                    steps.insert(((pos.0 + xy) as u32, (pos.1 + xy) as u32));
                 } else {
                     break;
                 }
             }
             for xy in 1..maxx {
                 if self.is_pos_empty((pos.0 + xy, pos.1 - xy)) {
-                    steps.insert((pos.0 + xy, pos.1 - xy));
+                    steps.insert(((pos.0 + xy) as u32, (pos.1 - xy) as u32));
                 } else {
                     break;
                 }
             }
             for xy in 1..maxx {
                 if self.is_pos_empty((pos.0 - xy, pos.1 + xy)) {
-                    steps.insert((pos.0 - xy, pos.1 + xy));
+                    steps.insert(((pos.0 - xy) as u32, (pos.1 + xy) as u32));
                 } else {
                     break;
                 }
             }
             for xy in 1..maxx {
                 if self.is_pos_empty((pos.0 - xy, pos.1 - xy)) {
-                    steps.insert((pos.0 - xy, pos.1 - xy));
+                    steps.insert(((pos.0 - xy) as u32, (pos.1 - xy) as u32));
                 } else {
                     break;
                 }
@@ -128,13 +130,15 @@ impl Board {
         let mut steps: HashSet<(u32, u32)> = HashSet::new();
         let ways_kill = [(-2, -2), (-2, 2), (2, -2), (2, 2)];
 
+        let pos = (pos.0 as i32, pos.1 as i32);
+
         if is_king {
             let mut f = false;
-            let maxx = std::cmp::max(self.board.len() as u32, self.board[0].len() as u32);
+            let maxx = std::cmp::max(self.board.len() as i32, self.board[0].len() as i32);
             for xy in 1..maxx {
                 if self.is_pos_empty((pos.0 + xy, pos.1 + xy)) {
                     if f {
-                        steps.insert((pos.0 + xy, pos.1 + xy));
+                        steps.insert(((pos.0 + xy) as u32, (pos.1 + xy) as u32));
                     }
                 } else {
                     if f {
@@ -145,9 +149,9 @@ impl Board {
             }
             f = false;
             for xy in 1..maxx {
-                if self.is_pos_empty((pos.0 + xy, pos.1 - xy)) {
+                if self.is_pos_empty(((pos.0 + xy) as i32, pos.1 - xy)) {
                     if f {
-                        steps.insert((pos.0 + xy, pos.1 - xy));
+                        steps.insert(((pos.0 + xy) as u32, (pos.1 - xy) as u32));
                     }
                 } else {
                     if f {
@@ -160,7 +164,7 @@ impl Board {
             for xy in 1..maxx {
                 if self.is_pos_empty((pos.0 - xy, pos.1 + xy)) {
                     if f {
-                        steps.insert((pos.0 - xy, pos.1 + xy));
+                        steps.insert(((pos.0 - xy) as u32, (pos.1 + xy) as u32));
                     }
                 } else {
                     if f {
@@ -173,7 +177,7 @@ impl Board {
             for xy in 1..maxx {
                 if self.is_pos_empty((pos.0 - xy, pos.1 - xy)) {
                     if f {
-                        steps.insert((pos.0 - xy, pos.1 - xy));
+                        steps.insert(((pos.0 - xy) as u32, (pos.1 - xy) as u32));
                     }
                 } else {
                     if f {
@@ -246,8 +250,12 @@ impl Board {
         (steps, steps_kill)
     }
 
-    pub fn is_pos_empty(&self, pos: (u32, u32)) -> bool {
-        if pos.0 >= self.board.len() as u32 || pos.1 >= self.board[0].len() as u32 {
+    pub fn is_pos_empty(&self, pos: (i32, i32)) -> bool {
+        if pos.0 < 0
+            || pos.1 < 0
+            || pos.0 >= self.board.len() as i32
+            || pos.1 >= self.board[0].len() as i32
+        {
             return false;
         }
 
@@ -283,5 +291,14 @@ impl Board {
 
     pub fn get_board_size(&self) -> (usize, usize) {
         (self.board.len(), self.board[0].len())
+    }
+
+    pub fn set_pos_king(&mut self, pos: (u32, u32)) {
+        if !self.is_pos_empty((pos.0 as i32, pos.1 as i32)) {
+            self.board[pos.0 as usize][pos.1 as usize]
+                .as_mut()
+                .unwrap()
+                .set_king();
+        }
     }
 }

@@ -81,27 +81,32 @@ impl GameObject {
             (pos_to.0 as u32, pos_to.1 as u32),
         );
 
+        if match self.order {
+            Order::WHITE if pos_to.1 == self.board.get_board_size().1 as i32 - 1 => true,
+            Order::BLACK if pos_to.1 == 0 => true,
+            _ => false,
+        } {
+            self.board.set_pos_king((pos_to.0 as u32, pos_to.1 as u32));
+        }
+
         for i in 1..((pos_to.0 as i32 - pos_from.0 as i32).abs()) {
             let x_sign = (pos_to.0 - pos_from.0) / (pos_to.0 - pos_from.0).abs();
             let y_sign = (pos_to.1 - pos_from.1) / (pos_to.1 - pos_from.1).abs();
 
-            if !self.board.is_pos_empty((
-                (pos_from.0 + i * x_sign) as u32,
-                (pos_from.1 + i * y_sign) as u32,
-            )) {
+            if !self
+                .board
+                .is_pos_empty(((pos_from.0 + i * x_sign), (pos_from.1 + i * y_sign)))
+            {
                 self.board.remove_pos_checker((
                     (pos_from.0 + i * x_sign) as u32,
                     (pos_from.1 + i * y_sign) as u32,
                 ));
-
-                println!("has killed");
 
                 if !self
                     .board
                     .get_kill_steps((pos_to.0 as u32, pos_to.1 as u32))
                     .is_empty()
                 {
-                    println!("change");
                     self.change_order();
                     self.must_kill_checker = Some((pos_to.0 as u32, pos_to.1 as u32));
                 }

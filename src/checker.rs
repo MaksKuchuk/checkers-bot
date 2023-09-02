@@ -19,6 +19,10 @@ impl Checker {
     pub fn is_king(&self) -> bool {
         self.is_king
     }
+
+    pub fn set_king(&mut self) {
+        self.is_king = true;
+    }
 }
 
 #[derive(Clone, PartialEq)]
