@@ -1,6 +1,8 @@
-use crate::board::{Board, CellKind};
-use crate::checker::Order;
+use crate::game::board::{Board, CellKind};
+use crate::game::checker::Order;
 use std::collections::HashSet;
+
+use super::checker::Checker;
 
 pub struct GameObject {
     board: Board,
@@ -20,13 +22,6 @@ impl GameObject {
 
         game.loc_possible_steps = game.get_possible_ways_for_all();
         game
-    }
-
-    pub fn show_board(&self) {
-        self.board.print_board();
-        for e in &self.loc_possible_steps {
-            println!("({} {}) ({} {})", e.0 .0, e.0 .1, e.1 .0, e.1 .1);
-        }
     }
 
     pub fn get_order(&self) -> Order {
@@ -136,5 +131,24 @@ impl GameObject {
         } else {
             None
         }
+    }
+
+    pub fn get_board_ref(&self) -> &Vec<Vec<Option<Checker>>> {
+        self.board.get_board_ref()
+    }
+
+    pub fn get_board_size(&self) -> (usize, usize) {
+        self.board.get_board_size()
+    }
+
+    pub fn get_board_order_pos(&self, pos: (i32, i32)) -> Option<Order> {
+        match self.board.checker_order(pos) {
+            CellKind::Some(v) => Some(v),
+            _ => None,
+        }
+    }
+
+    pub fn get_pos_is_king(&self, pos: (i32, i32)) -> bool {
+        self.board.get_pos_is_king(pos)
     }
 }

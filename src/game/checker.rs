@@ -25,7 +25,7 @@ impl Checker {
     }
 }
 
-#[derive(Clone, PartialEq)]
+#[derive(Clone, PartialEq, Debug)]
 pub enum Order {
     WHITE,
     BLACK,

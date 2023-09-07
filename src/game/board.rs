@@ -1,6 +1,6 @@
 use std::collections::HashSet;
 
-use crate::checker::{Checker, Order};
+use crate::game::checker::{Checker, Order};
 
 pub enum CellKind<T> {
     OutOfBoard,
@@ -16,30 +16,33 @@ impl Board {
     pub fn new(brd_size: (usize, usize)) -> Board {
         let mut brd: Vec<Vec<Option<Checker>>> = vec![vec![None; brd_size.1]; brd_size.0];
 
-        // for x in (0..brd_size.0).step_by(2) {
-        //     brd[x][0] = Some(Checker::new(Order::WHITE));
-        //     brd[x][2] = Some(Checker::new(Order::WHITE));
-        // }
-        // for x in (1..brd_size.0 as usize).step_by(2) {
-        //     brd[x][1] = Some(Checker::new(Order::WHITE));
-        // }
+        for x in (0..brd_size.0).step_by(2) {
+            brd[x][0] = Some(Checker::new(Order::WHITE));
+            brd[x][2] = Some(Checker::new(Order::WHITE));
+        }
+        for x in (1..brd_size.0 as usize).step_by(2) {
+            brd[x][1] = Some(Checker::new(Order::WHITE));
+        }
 
-        // for x in (0..brd_size.0).step_by(2) {
-        //     brd[x][brd_size.1 - 2] = Some(Checker::new(Order::BLACK));
-        // }
-        // for x in (1..brd_size.0).step_by(2) {
-        //     brd[x][brd_size.1 - 1] = Some(Checker::new(Order::BLACK));
-        //     brd[x][brd_size.1 - 3] = Some(Checker::new(Order::BLACK));
-        // }
+        for x in (0..brd_size.0).step_by(2) {
+            brd[x][brd_size.1 - 2] = Some(Checker::new(Order::BLACK));
+        }
+        for x in (1..brd_size.0).step_by(2) {
+            brd[x][brd_size.1 - 1] = Some(Checker::new(Order::BLACK));
+            brd[x][brd_size.1 - 3] = Some(Checker::new(Order::BLACK));
+        }
 
-        brd[6][6] = Some(Checker::new(Order::WHITE));
-        brd[3][3] = Some(Checker::new(Order::BLACK));
-        brd[3][5] = Some(Checker::new(Order::BLACK));
-        brd[3][7] = Some(Checker::new(Order::BLACK));
+        // brd[2][2] = Some(Checker::new(Order::WHITE));
+        // brd[0][2] = Some(Checker::new(Order::WHITE));
+        // brd[3][3] = Some(Checker::new(Order::BLACK));
+        // brd[1][3] = Some(Checker::new(Order::BLACK));
+        // brd[5][5] = Some(Checker::new(Order::BLACK));
+        // brd[5][3] = Some(Checker::new(Order::BLACK));
 
         Board { board: brd }
     }
 
+    #[warn(dead_code)]
     pub fn print_board(&self) {
         for y in (0..self.board[0].len()).rev() {
             for x in 0..self.board.len() {
@@ -136,54 +139,66 @@ impl Board {
             let mut f = false;
             let maxx = std::cmp::max(self.board.len() as i32, self.board[0].len() as i32);
             for xy in 1..maxx {
-                if self.is_pos_empty((pos.0 + xy, pos.1 + xy)) {
-                    if f {
+                match self.checker_order((pos.0 + xy, pos.1 + xy)) {
+                    CellKind::Empty if f => {
                         steps.insert(((pos.0 + xy) as u32, (pos.1 + xy) as u32));
                     }
-                } else {
-                    if f {
-                        break;
+                    CellKind::Some(v) if v != ord => {
+                        if f {
+                            break;
+                        }
+                        f = true;
                     }
-                    f = true;
+                    CellKind::OutOfBoard => break,
+                    _ => (),
                 }
             }
             f = false;
             for xy in 1..maxx {
-                if self.is_pos_empty(((pos.0 + xy) as i32, pos.1 - xy)) {
-                    if f {
+                match self.checker_order((pos.0 + xy, pos.1 - xy)) {
+                    CellKind::Empty if f => {
                         steps.insert(((pos.0 + xy) as u32, (pos.1 - xy) as u32));
                     }
-                } else {
-                    if f {
-                        break;
+                    CellKind::Some(v) if v != ord => {
+                        if f {
+                            break;
+                        }
+                        f = true;
                     }
-                    f = true;
+                    CellKind::OutOfBoard => break,
+                    _ => (),
                 }
             }
             f = false;
             for xy in 1..maxx {
-                if self.is_pos_empty((pos.0 - xy, pos.1 + xy)) {
-                    if f {
+                match self.checker_order((pos.0 - xy, pos.1 + xy)) {
+                    CellKind::Empty if f => {
                         steps.insert(((pos.0 - xy) as u32, (pos.1 + xy) as u32));
                     }
-                } else {
-                    if f {
-                        break;
+                    CellKind::Some(v) if v != ord => {
+                        if f {
+                            break;
+                        }
+                        f = true;
                     }
-                    f = true;
+                    CellKind::OutOfBoard => break,
+                    _ => (),
                 }
             }
             f = false;
             for xy in 1..maxx {
-                if self.is_pos_empty((pos.0 - xy, pos.1 - xy)) {
-                    if f {
+                match self.checker_order((pos.0 - xy, pos.1 - xy)) {
+                    CellKind::Empty if f => {
                         steps.insert(((pos.0 - xy) as u32, (pos.1 - xy) as u32));
                     }
-                } else {
-                    if f {
-                        break;
+                    CellKind::Some(v) if v != ord => {
+                        if f {
+                            break;
+                        }
+                        f = true;
                     }
-                    f = true;
+                    CellKind::OutOfBoard => break,
+                    _ => (),
                 }
             }
         } else {
@@ -300,5 +315,19 @@ impl Board {
                 .unwrap()
                 .set_king();
         }
+    }
+
+    pub fn get_pos_is_king(&self, pos: (i32, i32)) -> bool {
+        if let CellKind::Some(_) = self.checker_order(pos) {
+            return self.board[pos.0 as usize][pos.1 as usize]
+                .as_ref()
+                .unwrap()
+                .is_king();
+        }
+        false
+    }
+
+    pub fn get_board_ref(&self) -> &Vec<Vec<Option<Checker>>> {
+        &self.board
     }
 }

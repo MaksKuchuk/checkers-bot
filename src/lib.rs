@@ -1,3 +1,3 @@
-mod board;
-pub mod checker;
-pub mod game_object;
+pub mod controller;
+pub mod game;
+pub mod gui;
