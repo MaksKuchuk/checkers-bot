@@ -42,7 +42,6 @@ impl Board {
         Board { board: brd }
     }
 
-    #[warn(dead_code)]
     pub fn print_board(&self) {
         for y in (0..self.board[0].len()).rev() {
             for x in 0..self.board.len() {

@@ -5,5 +5,14 @@ edition = "2021"
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
+# To build python package
+[lib]
+name = "game_checkers"
+crate-type = ["cdylib"]
+
+
 [dependencies]
 macroquad = "0.4"
+pyo3 = { version = "0.19.2", features = ["extension-module"] }
+
+

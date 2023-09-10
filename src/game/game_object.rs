@@ -24,6 +24,10 @@ impl GameObject {
         game
     }
 
+    pub fn print_board(&self) {
+        self.board.print_board();
+    }
+
     pub fn get_order(&self) -> Order {
         self.order.clone()
     }

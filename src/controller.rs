@@ -18,11 +18,11 @@ impl Controller {
     }
 
     pub async fn run_player2player_game(&mut self) {
+        self.game.print_board();
+
         loop {
             self.take_checker();
             self.place_checker();
-
-            dbg!(self.game.is_win());
 
             Renderer::update(&self.game, self.handeled_checker_pos, mouse_position()).await;
         }
