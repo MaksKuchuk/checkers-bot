@@ -1,4 +1,7 @@
-use crate::{game::game_object::GameObject, gui::Renderer};
+use crate::{
+    game::{checker::Order, game_object::GameObject},
+    gui::Renderer,
+};
 use macroquad::prelude::{
     is_mouse_button_pressed, is_mouse_button_released, mouse_position, MouseButton,
 };
@@ -18,8 +21,6 @@ impl Controller {
     }
 
     pub async fn run_player2player_game(&mut self) {
-        self.game.print_board();
-
         loop {
             self.take_checker();
             self.place_checker();
@@ -30,15 +31,72 @@ impl Controller {
 
     pub async fn run_player2bot_game(&mut self) {
         loop {
-            self.take_checker();
-            self.place_checker();
+            if self.game.get_order() == Order::WHITE {
+                self.take_checker();
+                self.place_checker();
+            } else {
+                //self.game.make_step(step.0, step.1);
+            }
 
             Renderer::update(&self.game, self.handeled_checker_pos, mouse_position()).await;
         }
     }
 
-    pub async fn run_bot2bot_game(&self) {
-        loop {
+    pub async fn run_bot2bot_game(&mut self) {
+        let steps: [((u32, u32), (u32, u32)); 45] = [
+            ((4, 2), (5, 3)),
+            ((3, 5), (2, 4)),
+            ((2, 2), (1, 3)),
+            ((5, 5), (6, 4)),
+            ((1, 3), (3, 5)),
+            ((2, 6), (4, 4)),
+            ((5, 3), (3, 5)),
+            ((4, 6), (2, 4)),
+            ((0, 2), (1, 3)),
+            ((2, 4), (0, 2)),
+            ((5, 1), (4, 2)),
+            ((3, 7), (4, 6)),
+            ((4, 2), (5, 3)),
+            ((6, 4), (4, 2)),
+            ((3, 1), (5, 3)),
+            ((7, 5), (6, 4)),
+            ((5, 3), (7, 5)),
+            ((4, 6), (5, 5)),
+            ((4, 0), (3, 1)),
+            ((5, 5), (6, 4)),
+            ((7, 5), (5, 3)),
+            ((5, 7), (4, 6)),
+            ((3, 1), (2, 2)),
+            ((4, 6), (5, 5)),
+            ((2, 2), (1, 3)),
+            ((0, 2), (2, 4)),
+            ((2, 0), (3, 1)),
+            ((5, 5), (6, 4)),
+            ((5, 3), (7, 5)),
+            ((7, 5), (5, 7)),
+            ((5, 7), (1, 3)),
+            ((1, 5), (2, 4)),
+            ((1, 3), (5, 7)),
+            ((0, 6), (1, 5)),
+            ((5, 7), (1, 3)),
+            ((1, 7), (0, 6)),
+            ((3, 1), (2, 2)),
+            ((1, 5), (2, 4)),
+            ((1, 3), (5, 7)),
+            ((0, 6), (1, 5)),
+            ((5, 7), (1, 3)),
+            ((1, 5), (2, 4)),
+            ((1, 3), (5, 7)),
+            ((7, 7), (6, 6)),
+            ((5, 7), (7, 5)),
+        ];
+
+        use std::{thread, time::Duration};
+        Renderer::update(&self.game, None, mouse_position()).await;
+        for (from, to) in steps {
+            thread::sleep(Duration::from_millis(500));
+            self.game.make_step(from, to);
+
             Renderer::update(&self.game, None, mouse_position()).await;
         }
     }

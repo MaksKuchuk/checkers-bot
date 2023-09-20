@@ -7,12 +7,11 @@ edition = "2021"
 
 # To build python package
 [lib]
-name = "game_checkers"
-crate-type = ["cdylib"]
+# name = "game_checkers"
+# crate-type = ["cdylib"]
 
 
 [dependencies]
 macroquad = "0.4"
 pyo3 = { version = "0.19.2", features = ["extension-module"] }
-
-
+pyo3-asyncio = "0.19.0"

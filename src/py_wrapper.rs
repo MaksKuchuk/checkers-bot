@@ -33,6 +33,23 @@ impl PyBoard {
     pub fn get(&self) -> &Vec<Vec<Option<Checker>>> {
         &self.board
     }
+
+    pub fn get_pos_color(&self, pos: (u32, u32)) -> Option<PyOrder> {
+        match &self.board[pos.0 as usize][pos.1 as usize] {
+            None => None,
+            Some(v) => match v.get_color() {
+                Order::WHITE => Some(PyOrder::WHITE),
+                Order::BLACK => Some(PyOrder::BLACK),
+            },
+        }
+    }
+
+    pub fn get_pos_is_king(&self, pos: (u32, u32)) -> bool {
+        return match &self.board[pos.0 as usize][pos.1 as usize] {
+            None => false,
+            Some(v) => v.is_king(),
+        };
+    }
 }
 
 #[pymethods]

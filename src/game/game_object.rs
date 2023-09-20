@@ -155,4 +155,90 @@ impl GameObject {
     pub fn get_pos_is_king(&self, pos: (i32, i32)) -> bool {
         self.board.get_pos_is_king(pos)
     }
+
+    pub fn input_vector(&self, order: Order, pos: &((u32, u32), (u32, u32))) -> Vec<f32> {
+        //  0..31       - items with your color
+        //  32..63     - items with oponents colors
+        //  64..95    - king items with your color
+        //  96..127    - king items with oponents color
+        //  128..159    - movement start position
+        //  160..191    - movement end position
+
+        let board = self.get_board_ref();
+
+        let input_board = |b: &mut Vec<Vec<f32>>, ord: Order, is_king: bool| {
+            for x in 0..8 {
+                for y in 0..8 {
+                    b[x][y] = match &board[x][y] {
+                        Some(v) if v.get_color() == ord && v.is_king() == is_king => 1.,
+                        _ => 0.,
+                    }
+                }
+            }
+        };
+
+        let mut wcol = vec![vec![0.; 8]; 8];
+        let mut bcol = vec![vec![0.; 8]; 8];
+        let mut wkcol = vec![vec![0.; 8]; 8];
+        let mut bkcol = vec![vec![0.; 8]; 8];
+        let mut stpos = vec![vec![0.; 8]; 8];
+        let mut edpos = vec![vec![0.; 8]; 8];
+
+        input_board(&mut wcol, Order::WHITE, false);
+        input_board(&mut bcol, Order::BLACK, false);
+
+        input_board(&mut wkcol, Order::WHITE, true);
+        input_board(&mut bkcol, Order::BLACK, true);
+
+        stpos[pos.0 .0 as usize][pos.0 .1 as usize] = 1.;
+        edpos[pos.1 .0 as usize][pos.1 .1 as usize] = 1.;
+
+        let mut inp: Vec<f32> = Vec::new();
+
+        if let Order::WHITE = order {
+            inp.extend(one_line(&wcol).iter());
+            inp.extend(one_line(&bcol).iter());
+            inp.extend(one_line(&wkcol).iter());
+            inp.extend(one_line(&bkcol).iter());
+            inp.extend(one_line(&stpos).iter());
+            inp.extend(one_line(&edpos).iter());
+        } else {
+            transpose(&mut wcol);
+            transpose(&mut bcol);
+            transpose(&mut wkcol);
+            transpose(&mut bkcol);
+            transpose(&mut stpos);
+            transpose(&mut edpos);
+
+            inp.extend(one_line(&bcol).iter());
+            inp.extend(one_line(&wcol).iter());
+            inp.extend(one_line(&bkcol).iter());
+            inp.extend(one_line(&wkcol).iter());
+            inp.extend(one_line(&stpos).iter());
+            inp.extend(one_line(&edpos).iter());
+        }
+
+        inp
+    }
+}
+
+fn transpose(b: &mut Vec<Vec<f32>>) {
+    b.reverse();
+    for e in b {
+        e.reverse();
+    }
+}
+
+fn one_line(b: &Vec<Vec<f32>>) -> Vec<f32> {
+    let mut v = Vec::new();
+
+    for x in 0..8 {
+        for y in 0..8 {
+            if (x + y) % 2 == 0 {
+                v.push(b[x][y]);
+            }
+        }
+    }
+
+    v
 }

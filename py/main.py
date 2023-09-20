@@ -16,20 +16,29 @@ import numpy as np
 # input_vector_by_board(PyBoard, Order, ((0, 0), (0, 0)))
 
 INPUT_SIZE = 192
+new = False
 
-model = tf.keras.Sequential([
-    tf.keras.layers.Dense(256, input_shape=(192,)),
-    tf.keras.layers.Dense(256),
-    tf.keras.layers.Dense(256),
-    tf.keras.layers.Dense(1)
-])
+model = 0
+if new:
+    model = tf.keras.Sequential([
+        tf.keras.layers.Dense(256, input_shape=(INPUT_SIZE,), activation='relu'),
+        tf.keras.layers.Dense(128, activation='relu'),
+        tf.keras.layers.Dense(1, activation='sigmoid'),
+    ])
 
-model.compile(optimizer='adam', loss='mse')
+    model.compile(optimizer='adam', loss='mse', metrics=["accuracy"])
+else:
+    model = tf.keras.models.load_model('models/model140.keras')
 
 from game import *
+from modelFit import *
 
-boards = makeGame(model, 5, 1)
+for i in range(141, 500):
+    print(f"iteration: {i}")
+    boards = makeGame(model, lastSteps=i, rndSteps=3)
+    fitModel(model, boards)
 
-# print(boards)
+    if i % 10 == 0:
+        model.save(f'models/model{i}.keras')
 
 
