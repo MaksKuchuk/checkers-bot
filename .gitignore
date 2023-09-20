@@ -1,4 +1,4 @@
 /target
 /.vscode/
-/model
-/py/models
+/model/
+/py/models/
