@@ -1,6 +1,7 @@
 from gui import Renderer
 import game_checkers as gm
 import pygame as pg
+from game import predictNextStep
 
 class Controller:
     def __init__(self, screen):
@@ -8,7 +9,7 @@ class Controller:
         self.handeled_checker_pos = None
         self.screen = screen
 
-    def run_player2player_game(self, screen):
+    def run_player2player_game(self):
         running = True
         while running: 
             for event in pg.event.get(): 
@@ -20,23 +21,23 @@ class Controller:
 
             Renderer.update(self.screen, self.game, self.handeled_checker_pos, pg.mouse.get_pos())
 
-    def run_player2bot_game(self, screen):
+    def run_player2bot_game(self, model):
         running = True
         while running: 
             for event in pg.event.get(): 
                 if event.type == pg.QUIT: 
                     running = False
 
-            if self.game.get_order() == Order.WHITE:
+            if self.game.get_order() == gm.Order.WHITE:
                 self.take_checker()
                 self.place_checker()
             else:
-                pass
-                #self.game.make_step(step[0], step[1])
+                step = predictNextStep(model, self.game)
+                self.game.make_step(step[0], step[1])
 
             Renderer.update(self.screen, self.game, self.handeled_checker_pos, pg.mouse.get_pos())
 
-    def run_bot2bot_game(self, screen):
+    def run_bot2bot_game(self):
         pass
 
     def is_mouse_button_pressed(self):
