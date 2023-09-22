@@ -29,10 +29,11 @@ pub struct PyBoard {
     board: Vec<Vec<Option<Checker>>>,
 }
 
+#[pymethods]
 impl PyBoard {
-    pub fn get(&self) -> &Vec<Vec<Option<Checker>>> {
-        &self.board
-    }
+    // pub fn get(&self) -> &Vec<Vec<Option<Checker>>> {
+    //     &self.board
+    // }
 
     pub fn get_pos_color(&self, pos: (u32, u32)) -> Option<PyOrder> {
         match &self.board[pos.0 as usize][pos.1 as usize] {
@@ -83,6 +84,14 @@ impl Checkers {
         match self.game.get_order() {
             Order::WHITE => PyOrder::WHITE,
             Order::BLACK => PyOrder::BLACK,
+        }
+    }
+
+    fn get_board_order_pos(&self, pos: (i32, i32)) -> Option<PyOrder> {
+        match &self.game.get_board_order_pos(pos) {
+            Some(Order::WHITE) => Some(PyOrder::WHITE),
+            Some(Order::BLACK) => Some(PyOrder::BLACK),
+            _ => None,
         }
     }
 
@@ -193,7 +202,7 @@ pub fn input_vector_by_board(
     //  128..159    - movement start position
     //  160..191    - movement end position
 
-    let board = brd.get();
+    let board = &brd.board;
 
     let input_board = |b: &mut Vec<Vec<f64>>, ord: Order, is_king: bool| {
         for x in 0..8 {

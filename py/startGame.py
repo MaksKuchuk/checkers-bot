@@ -1,13 +1,9 @@
 import game_checkers as gm
 import pygame as pg
+from controller import Controller
 
 pg.init()
-screen = pygame.display.set_mode([500, 500])
-xsize, ysize = screen.get_size()
+screen = pg.display.set_mode([800, 800])
 
-running = True
-while running: 
-    for event in pygame.event.get(): 
-        if event.type == pygame.QUIT: 
-            running = False
-    
+cnt = Controller(screen)
+cnt.run_player2player_game(screen)

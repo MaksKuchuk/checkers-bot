@@ -7,8 +7,8 @@ edition = "2021"
 
 # To build python package
 [lib]
-# name = "game_checkers"
-# crate-type = ["cdylib"]
+name = "game_checkers"
+crate-type = ["cdylib"]
 
 
 [dependencies]
